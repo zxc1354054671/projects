@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+	<!-- 配置bonecp数据源 -->
+	<bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource"
+		p:driverClass="oracle.jdbc.driver.OracleDriver"
+		p:jdbcUrl="jdbc:oracle:thin:@localhost:1521:orcl"
+		p:username="zxc" p:password="zxc"/>
+	<!-- sessionFactory对象 -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
+		p:dataSource-ref="dataSource" p:configLocation="classpath:hibernate.cfg.xml" />
+	<!-- 注入HibernateTemplate模板 简化操作 -->
+	<bean id="ht" class="org.springframework.orm.hibernate4.HibernateTemplate"
+		p:sessionFactory-ref="sessionFactory"/>
+	<!-- 注入事务管理器 -->
+	<bean id="txManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager"
+		p:sessionFactory-ref="sessionFactory"/>
+	<!-- 配置基于注解驱动的声明式事务 -->
+	<tx:annotation-driven transaction-manager="txManager"/>
+	<!-- 将bean实例化到spring容器中		扫描基于注解的业务bean com.serviceImpl -->
+	<context:component-scan base-package="com"/>
+	<!-- <tx:advice id="txAdvice" transaction-manager="txManager">
+	  <tx:attributes>
+	    <tx:method name="s*" read-only="false" propagation="NOT_SUPPORTED"/>
+	    <tx:method name="i*" read-only="false" propagation="REQUIRED"/> 
+	    <tx:method name="u*" read-only="false" propagation="REQUIRED"/>
+	    <tx:method name="d*" read-only="false" propagation="REQUIRED"/>
+	  </tx:attributes>
+	</tx:advice> -->
+</beans>
